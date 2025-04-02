@@ -1,0 +1,41 @@
+name: leaf_lens
+description: AI Plant Doctor Chatbot with leaf scanning capabilities
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.17.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  cupertino_icons: ^1.0.5
+  camera: ^0.10.5
+  image_picker: ^1.0.4
+  tflite_flutter: ^0.10.1
+  provider: ^6.0.5
+  http: ^1.1.0
+  shared_preferences: ^2.2.0
+  path_provider: ^2.1.1
+  intl: ^0.19.0
+  flutter_chat_ui: ^1.6.9
+  flutter_chat_types: ^3.6.1
+  permission_handler: ^10.4.3
+  flutter_svg: ^2.0.7
+  google_fonts: ^5.1.0
+  uuid: ^4.1.0
+  flutter_staggered_animations: ^1.1.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.2
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/ml_models/
+    - assets/locales/ 
