@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'models/language_model.dart';
 import 'screens/home_screen.dart';
+import 'screens/splash_screen.dart';
 import 'utils/app_localization.dart';
 
 // App color scheme
@@ -20,7 +22,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
   final String languageCode = prefs.getString('language_code') ?? 'en';
-  
+
   runApp(
     ChangeNotifierProvider(
       create: (_) => LanguageModel(languageCode),
@@ -35,7 +37,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final languageModel = Provider.of<LanguageModel>(context);
-    
+
+    // Define base text theme using Google Fonts
+    final baseTextTheme =
+        GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme);
+
     return MaterialApp(
       title: 'LeafLens - Plant Doctor',
       debugShowCheckedModeBanner: false,
@@ -51,27 +57,41 @@ class MyApp extends StatelessWidget {
           onSecondary: Colors.white,
           onSurface: AppColors.textDark,
           onBackground: AppColors.textDark,
+          error: Colors.redAccent,
+          onError: Colors.white,
         ),
-        appBarTheme: const AppBarTheme(
+        appBarTheme: AppBarTheme(
           backgroundColor: AppColors.primaryGreen,
+          foregroundColor: Colors.white,
           elevation: 0,
+          centerTitle: true,
+          titleTextStyle: baseTextTheme.titleLarge?.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primaryGreen,
             foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
+            textStyle:
+                baseTextTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
           ),
         ),
         outlinedButtonTheme: OutlinedButtonThemeData(
           style: OutlinedButton.styleFrom(
             foregroundColor: AppColors.primaryGreen,
-            side: const BorderSide(color: AppColors.primaryGreen),
+            side: const BorderSide(color: AppColors.primaryGreen, width: 1.5),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
+            textStyle:
+                baseTextTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
           ),
         ),
         cardTheme: CardTheme(
@@ -79,15 +99,39 @@ class MyApp extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          elevation: 2,
+          elevation: 3,
+          margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         ),
-        fontFamily: 'Roboto',
-        textTheme: const TextTheme(
-          bodyLarge: TextStyle(color: AppColors.textDark),
-          bodyMedium: TextStyle(color: AppColors.textDark),
-          titleLarge: TextStyle(color: AppColors.textDark, fontWeight: FontWeight.bold),
-          titleMedium: TextStyle(color: AppColors.textDark, fontWeight: FontWeight.bold),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: AppColors.darkBeige,
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide:
+                const BorderSide(color: AppColors.primaryGreen, width: 1.5),
+          ),
+          hintStyle:
+              baseTextTheme.bodyLarge?.copyWith(color: AppColors.textLight),
         ),
+        textTheme: baseTextTheme.copyWith(
+          bodyLarge: baseTextTheme.bodyLarge
+              ?.copyWith(color: AppColors.textDark, fontSize: 16),
+          bodyMedium: baseTextTheme.bodyMedium
+              ?.copyWith(color: AppColors.textLight, fontSize: 14),
+          titleLarge: baseTextTheme.titleLarge?.copyWith(
+              color: AppColors.textDark, fontWeight: FontWeight.w600),
+          titleMedium: baseTextTheme.titleMedium?.copyWith(
+              color: AppColors.textDark, fontWeight: FontWeight.w500),
+          labelLarge:
+              baseTextTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
+        ),
+        useMaterial3: true,
       ),
       locale: Locale(languageModel.currentLanguage),
       supportedLocales: const [
@@ -101,7 +145,7 @@ class MyApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      home: const HomeScreen(),
+      home: const SplashScreen(),
     );
   }
-} 
+}

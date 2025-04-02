@@ -12,7 +12,7 @@ class DiagnosisResult {
   final List<String> preventionTips;
   final double confidence;
   final PlantCondition condition;
-  
+
   DiagnosisResult({
     required this.diseaseName,
     required this.description,
@@ -21,7 +21,7 @@ class DiagnosisResult {
     required this.confidence,
     required this.condition,
   });
-  
+
   factory DiagnosisResult.fromJson(Map<String, dynamic> json) {
     return DiagnosisResult(
       diseaseName: json['disease_name'],
@@ -29,11 +29,11 @@ class DiagnosisResult {
       remedies: List<String>.from(json['remedies']),
       preventionTips: List<String>.from(json['prevention_tips']),
       confidence: json['confidence'].toDouble(),
-      condition: _conditionFromString(json['condition']),
+      condition: conditionFromString(json['condition']),
     );
   }
-  
-  static PlantCondition _conditionFromString(String condition) {
+
+  static PlantCondition conditionFromString(String condition) {
     switch (condition.toLowerCase()) {
       case 'healthy':
         return PlantCondition.healthy;
@@ -47,4 +47,4 @@ class DiagnosisResult {
         return PlantCondition.moderate;
     }
   }
-} 
+}

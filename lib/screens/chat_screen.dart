@@ -7,7 +7,7 @@ import '../utils/app_localization.dart';
 
 class ChatScreen extends StatefulWidget {
   final String? initialQuestion;
-  
+
   const ChatScreen({
     Key? key,
     this.initialQuestion,
@@ -17,7 +17,8 @@ class ChatScreen extends StatefulWidget {
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateMixin {
+class _ChatScreenState extends State<ChatScreen>
+    with SingleTickerProviderStateMixin {
   final List<types.Message> _messages = [];
   final _user = const types.User(id: 'user');
   final _bot = const types.User(id: 'bot', firstName: 'Plant Doctor');
@@ -25,32 +26,31 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
   bool _isTyping = false;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
-  
+
   @override
   void initState() {
     super.initState();
     _chatService = ChatService();
-    
+
     // Initialize animations
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
     );
-    
+
     _fadeAnimation = CurvedAnimation(
       parent: _animationController,
       curve: Curves.easeOut,
     );
-    
+
     // Add welcome message with animation
     Future.delayed(const Duration(milliseconds: 300), () {
       _addBotMessage(
-        'Welcome to LeafLens Plant Doctor! I can help you with plant care, disease identification, and gardening tips. How can I assist you today?'
-      );
-      
+          'Welcome to LeafLens Plant Doctor! I can help you with plant care, disease identification, and gardening tips. How can I assist you today?');
+
       _animationController.forward();
     });
-    
+
     // If there's an initial question, send it after a delay
     if (widget.initialQuestion != null) {
       Future.delayed(const Duration(milliseconds: 1500), () {
@@ -60,13 +60,13 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
       });
     }
   }
-  
+
   @override
   void dispose() {
     _animationController.dispose();
     super.dispose();
   }
-  
+
   void _addBotMessage(String text) {
     final botMessage = types.TextMessage(
       author: _bot,
@@ -74,12 +74,12 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
       text: text,
       createdAt: DateTime.now().millisecondsSinceEpoch,
     );
-    
+
     setState(() {
       _messages.insert(0, botMessage);
     });
   }
-  
+
   void _addUserMessage(String text) {
     final userMessage = types.TextMessage(
       author: _user,
@@ -87,45 +87,45 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
       text: text,
       createdAt: DateTime.now().millisecondsSinceEpoch,
     );
-    
+
     setState(() {
       _messages.insert(0, userMessage);
     });
   }
-  
+
   void _handleSendPressed(types.PartialText message) async {
     _addUserMessage(message.text);
-    
+
     setState(() {
       _isTyping = true;
     });
-    
+
     try {
       final response = await _chatService.sendMessage(message.text);
-      
+
       setState(() {
         _isTyping = false;
       });
-      
+
       _addBotMessage(response);
     } catch (e) {
       setState(() {
         _isTyping = false;
       });
-      
+
       _addBotMessage(
-        'Sorry, I encountered an error while processing your request. Please try again later.'
-      );
+          'Sorry, I encountered an error while processing your request. Please try again later.');
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     final localization = AppLocalization.of(context);
-    
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(localization?.translate('chat_with_plant_doctor') ?? 'Chat with Plant Doctor'),
+        title: Text(localization?.translate('chat_with_plant_doctor') ??
+            'Chat with Plant Doctor'),
         backgroundColor: Theme.of(context).primaryColor,
         elevation: 0,
       ),
@@ -167,8 +167,8 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
                           builder: (context, value, child) {
                             return Opacity(
                               opacity: value,
-                              child: Transform.translateY(
-                                offset: 10 * (1 - value),
+                              child: Transform.translate(
+                                offset: Offset(0, 10 * (1 - value)),
                                 child: child,
                               ),
                             );
@@ -184,13 +184,12 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
                         TweenAnimationBuilder<double>(
                           tween: Tween<double>(begin: 0.0, end: 1.0),
                           duration: const Duration(milliseconds: 800),
-                          delay: const Duration(milliseconds: 200),
                           curve: Curves.easeOut,
                           builder: (context, value, child) {
                             return Opacity(
                               opacity: value,
-                              child: Transform.translateY(
-                                offset: 10 * (1 - value),
+                              child: Transform.translate(
+                                offset: Offset(0, 10 * (1 - value)),
                                 child: child,
                               ),
                             );
@@ -199,7 +198,10 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
                             'AI Plant Care Expert',
                             style: TextStyle(
                               fontSize: 12,
-                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withOpacity(0.7),
                             ),
                           ),
                         ),
@@ -242,28 +244,13 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
                     color: Colors.black,
                     height: 1.5,
                   ),
-                  sentMessageChatButtonIcon: Icon(
-                    Icons.reply,
-                    color: Colors.white.withOpacity(0.7),
-                    size: 18,
-                  ),
-                  receivedMessageChatButtonIcon: Icon(
-                    Icons.reply,
-                    color: Colors.black.withOpacity(0.7),
-                    size: 18,
-                  ),
                 ),
                 inputOptions: InputOptions(
                   sendButtonVisibilityMode: SendButtonVisibilityMode.always,
-                  sendButtonIcon: Icon(
-                    Icons.send_rounded,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                  hint: localization?.translate('type_message') ?? 'Type your message',
                 ),
               ),
             ),
-            
+
             // Tips banner
             SlideTransition(
               position: Tween<Offset>(
@@ -286,8 +273,8 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        localization?.translate('chat_tip') ?? 
-                          'Tip: You can ask specific questions about plant diseases, care routines, or fertilizers.',
+                        localization?.translate('chat_tip') ??
+                            'Tip: You can ask specific questions about plant diseases, care routines, or fertilizers.',
                         style: const TextStyle(
                           fontSize: 12,
                           color: Colors.grey,
@@ -303,4 +290,4 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
       ),
     );
   }
-} 
+}
