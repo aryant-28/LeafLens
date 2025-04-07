@@ -7,6 +7,10 @@ import 'models/language_model.dart';
 import 'screens/home_screen.dart';
 import 'screens/splash_screen.dart';
 import 'utils/app_localization.dart';
+import 'screens/reminder_screen.dart';
+import 'services/simple_notification_service.dart';
+import 'services/scheduled_notification_service.dart';
+import 'services/basic_notification.dart';
 
 // App color scheme
 class AppColors {
@@ -20,15 +24,49 @@ class AppColors {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final prefs = await SharedPreferences.getInstance();
-  final String languageCode = prefs.getString('language_code') ?? 'en';
 
-  runApp(
-    ChangeNotifierProvider(
-      create: (_) => LanguageModel(languageCode),
-      child: const MyApp(),
-    ),
-  );
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final String languageCode = prefs.getString('language_code') ?? 'en';
+
+    // Initialize the basic notification service first
+    try {
+      await BasicNotification.initialize();
+      print("=== Basic notification service initialized ===");
+    } catch (e) {
+      print("!!! CRITICAL ERROR initializing basic notification: $e");
+    }
+
+    // Initialize other notification services
+    try {
+      // For test notifications
+      await SimpleNotificationService().initialize();
+      print("Simple notification service initialized successfully");
+
+      // For scheduled reminders
+      await ScheduledNotificationService().initialize();
+      print("Scheduled notification service initialized successfully");
+    } catch (e) {
+      print("Failed to initialize notification services: $e");
+      // Continue even if notification initialization fails
+    }
+
+    runApp(
+      ChangeNotifierProvider(
+        create: (_) => LanguageModel(languageCode),
+        child: const MyApp(),
+      ),
+    );
+  } catch (e) {
+    print("Error during app initialization: $e");
+    // Fallback initialization
+    runApp(
+      ChangeNotifierProvider(
+        create: (_) => LanguageModel('en'),
+        child: const MyApp(),
+      ),
+    );
+  }
 }
 
 class MyApp extends StatelessWidget {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/language_model.dart';
 import '../utils/app_localization.dart';
+import 'reminder_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -10,7 +11,7 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final localization = AppLocalization.of(context);
     final languageModel = Provider.of<LanguageModel>(context);
-    
+
     return Scaffold(
       appBar: AppBar(
         title: Text(localization?.translate('settings') ?? 'Settings'),
@@ -19,13 +20,28 @@ class SettingsScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.alarm),
+              title: Text(localization?.translate('plant_reminders') ??
+                  'Plant Reminders'),
+              subtitle: Text(localization?.translate('set_daily_reminders') ??
+                  'Set daily reminders to check your plants'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ReminderScreen(),
+                  ),
+                );
+              },
+            ),
+          ),
           // Language section
           _buildSectionHeader(
-            context, 
-            localization?.translate('language') ?? 'Language'
-          ),
+              context, localization?.translate('language') ?? 'Language'),
           const SizedBox(height: 8),
-          
+
           _buildLanguageOption(
             context,
             'English',
@@ -33,7 +49,7 @@ class SettingsScreen extends StatelessWidget {
             languageModel.currentLanguage == 'en',
             () => languageModel.changeLanguage('en'),
           ),
-          
+
           _buildLanguageOption(
             context,
             'हिंदी (Hindi)',
@@ -41,7 +57,7 @@ class SettingsScreen extends StatelessWidget {
             languageModel.currentLanguage == 'hi',
             () => languageModel.changeLanguage('hi'),
           ),
-          
+
           _buildLanguageOption(
             context,
             'मराठी (Marathi)',
@@ -49,76 +65,71 @@ class SettingsScreen extends StatelessWidget {
             languageModel.currentLanguage == 'mr',
             () => languageModel.changeLanguage('mr'),
           ),
-          
+
           const SizedBox(height: 24),
-          
+
           // About section
           _buildSectionHeader(
-            context, 
-            localization?.translate('about') ?? 'About'
-          ),
+              context, localization?.translate('about') ?? 'About'),
           const SizedBox(height: 8),
-          
+
           _buildInfoCard(
             context,
             title: localization?.translate('app_name') ?? 'LeafLens',
-            description: localization?.translate('app_description') ?? 
-              'AI-powered plant disease diagnostic tool',
+            description: localization?.translate('app_description') ??
+                'AI-powered plant disease diagnostic tool',
             icon: Icons.eco,
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Version info
           ListTile(
             title: Text(localization?.translate('version') ?? 'Version'),
             trailing: const Text('1.0.0'),
             dense: true,
           ),
-          
+
           // AI models info
           ExpansionTile(
-            title: Text(localization?.translate('ai_models_used') ?? 'AI Models Used'),
+            title: Text(
+                localization?.translate('ai_models_used') ?? 'AI Models Used'),
             tilePadding: EdgeInsets.zero,
             childrenPadding: const EdgeInsets.symmetric(horizontal: 16),
             children: [
               ListTile(
                 title: const Text('ResNet-50'),
-                subtitle: Text(
-                  localization?.translate('resnet_description') ?? 
-                    'Deep residual network for image classification'
-                ),
+                subtitle: Text(localization?.translate('resnet_description') ??
+                    'Deep residual network for image classification'),
                 dense: true,
               ),
               ListTile(
                 title: const Text('EfficientNet-B0'),
-                subtitle: Text(
-                  localization?.translate('efficientnet_description') ?? 
-                    'Compact convolutional neural network optimized for mobile'
-                ),
+                subtitle: Text(localization
+                        ?.translate('efficientnet_description') ??
+                    'Compact convolutional neural network optimized for mobile'),
                 dense: true,
               ),
             ],
           ),
-          
+
           const SizedBox(height: 24),
-          
+
           // Help section
-          _buildSectionHeader(
-            context, 
-            localization?.translate('help_support') ?? 'Help & Support'
-          ),
+          _buildSectionHeader(context,
+              localization?.translate('help_support') ?? 'Help & Support'),
           const SizedBox(height: 8),
-          
+
           ListTile(
             leading: const Icon(Icons.contact_support_outlined),
-            title: Text(localization?.translate('contact_support') ?? 'Contact Support'),
+            title: Text(localization?.translate('contact_support') ??
+                'Contact Support'),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             onTap: () {
               // Open contact support page
             },
           ),
-          
+
           ListTile(
             leading: const Icon(Icons.help_outline),
             title: Text(localization?.translate('how_to_use') ?? 'How to Use'),
@@ -127,10 +138,11 @@ class SettingsScreen extends StatelessWidget {
               // Open help guide
             },
           ),
-          
+
           ListTile(
             leading: const Icon(Icons.privacy_tip_outlined),
-            title: Text(localization?.translate('privacy_policy') ?? 'Privacy Policy'),
+            title: Text(
+                localization?.translate('privacy_policy') ?? 'Privacy Policy'),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             onTap: () {
               // Open privacy policy
@@ -140,7 +152,7 @@ class SettingsScreen extends StatelessWidget {
       ),
     );
   }
-  
+
   Widget _buildSectionHeader(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
@@ -154,7 +166,7 @@ class SettingsScreen extends StatelessWidget {
       ),
     );
   }
-  
+
   Widget _buildLanguageOption(
     BuildContext context,
     String name,
@@ -178,7 +190,7 @@ class SettingsScreen extends StatelessWidget {
       ),
     );
   }
-  
+
   Widget _buildInfoCard(
     BuildContext context, {
     required String title,
@@ -234,4 +246,4 @@ class SettingsScreen extends StatelessWidget {
       ),
     );
   }
-} 
+}
