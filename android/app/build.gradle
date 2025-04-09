@@ -24,7 +24,7 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.example.leaf_lens"
-    compileSdk = 35
+    compileSdk = 33
     ndkVersion = "25.1.8937393"
 
     compileOptions {
@@ -46,7 +46,7 @@ android {
     defaultConfig {
         applicationId "com.example.leaf_lens"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 33
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
     }

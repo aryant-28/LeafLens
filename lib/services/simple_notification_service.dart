@@ -35,26 +35,17 @@ class SimpleNotificationService {
 
       await _notifications.initialize(
         initSettings,
-        onDidReceiveNotificationResponse: (NotificationResponse details) {
-          // Handle notification tap
-          print('Notification tapped with payload: ${details.payload}');
+        onDidReceiveNotificationResponse:
+            (NotificationResponse response) async {
+          print('Notification tapped with payload: ${response.payload}');
         },
       );
-
-      // Make sure notifications appear in foreground too
-      await _configureLocalTimeZone();
 
       _isInitialized = true;
       print('Notification service initialized successfully');
     } catch (e) {
       print('Error initializing notification service: $e');
-      // Don't set _isInitialized to true if there was an error
     }
-  }
-
-  Future<void> _configureLocalTimeZone() async {
-    // This method would normally configure timezone data but we'll leave it simple
-    return;
   }
 
   Future<bool> showSimpleNotification({
@@ -65,7 +56,6 @@ class SimpleNotificationService {
       if (!_isInitialized) {
         await initialize();
         if (!_isInitialized) {
-          // If initialization failed, return false
           return false;
         }
       }

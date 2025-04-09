@@ -1,83 +1,74 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
 
 class BasicNotification {
   static final FlutterLocalNotificationsPlugin _notifications =
       FlutterLocalNotificationsPlugin();
   static bool _isInitialized = false;
 
-  // Call this function once at app startup
-  static Future<bool> initialize() async {
-    if (_isInitialized) return true;
+  static Future<void> initialize() async {
+    if (_isInitialized) return;
 
     try {
-      // For Android - use @mipmap reference format
       const AndroidInitializationSettings androidSettings =
           AndroidInitializationSettings('@mipmap/ic_launcher');
 
-      // For iOS
-      const IOSInitializationSettings iOSSettings = IOSInitializationSettings();
-
-      // Initialize settings for both platforms
-      const InitializationSettings initSettings = InitializationSettings(
-        android: androidSettings,
-        iOS: iOSSettings,
+      const DarwinInitializationSettings iosSettings =
+          DarwinInitializationSettings(
+        requestSoundPermission: true,
+        requestBadgePermission: true,
+        requestAlertPermission: true,
       );
 
-      // Initialize the plugin
-      bool? result = await _notifications.initialize(
+      const InitializationSettings initSettings = InitializationSettings(
+        android: androidSettings,
+        iOS: iosSettings,
+      );
+
+      await _notifications.initialize(
         initSettings,
-        onSelectNotification: (String? payload) async {
-          print('Notification tapped with payload: $payload');
+        onDidReceiveNotificationResponse:
+            (NotificationResponse response) async {
+          print('Notification tapped with payload: ${response.payload}');
         },
       );
 
       _isInitialized = true;
-      print('Notification service initialized with result: $result');
-      return true;
+      print('Basic notification service initialized successfully');
     } catch (e) {
-      print('ERROR initializing notification service: $e');
-      return false;
+      print('Error initializing basic notification service: $e');
+      rethrow;
     }
   }
 
-  // Show a basic notification immediately
   static Future<bool> showNow(String title, String body) async {
     if (!_isInitialized) {
-      bool initialized = await initialize();
-      if (!initialized) return false;
+      await initialize();
     }
 
     try {
-      // Define the android notification details - note the channel description parameter position
       const AndroidNotificationDetails androidDetails =
           AndroidNotificationDetails(
-        'basic_channel', // channel id
-        'Basic Notifications', // channel name
-        channelDescription:
-            'Simple notification channel', // use named parameter for description
+        'basic_channel',
+        'Basic Notifications',
+        channelDescription: 'For basic test notifications',
         importance: Importance.max,
         priority: Priority.high,
       );
 
-      // Create platform-specific notification details
-      const NotificationDetails platformDetails = NotificationDetails(
+      const DarwinNotificationDetails iosDetails = DarwinNotificationDetails();
+
+      const NotificationDetails notificationDetails = NotificationDetails(
         android: androidDetails,
-        iOS: IOSNotificationDetails(),
+        iOS: iosDetails,
       );
 
-      // Show the notification with a random ID
-      final int id = DateTime.now().millisecondsSinceEpoch % 10000;
-      await _notifications.show(
-        id,
-        title,
-        body,
-        platformDetails,
-      );
-
-      print('Basic notification sent successfully with ID: $id!');
+      final int id = DateTime.now().millisecondsSinceEpoch % 100000;
+      await _notifications.show(id, title, body, notificationDetails);
       return true;
     } catch (e) {
-      print('ERROR showing notification: $e');
+      print('Error showing basic notification: $e');
       return false;
     }
   }

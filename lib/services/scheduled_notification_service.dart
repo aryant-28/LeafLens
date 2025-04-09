@@ -1,5 +1,7 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
 import 'dart:convert';
 import '../models/plant_reminder.dart';
 
@@ -18,6 +20,11 @@ class ScheduledNotificationService {
     if (_isInitialized) return;
 
     try {
+      // Initialize timezone
+      tz.initializeTimeZones();
+      final String timeZoneName = tz.local.name;
+      tz.setLocalLocation(tz.getLocation(timeZoneName));
+
       const AndroidInitializationSettings androidSettings =
           AndroidInitializationSettings('@mipmap/ic_launcher');
 
@@ -35,9 +42,9 @@ class ScheduledNotificationService {
 
       await _notifications.initialize(
         initSettings,
-        onDidReceiveNotificationResponse: (NotificationResponse details) {
-          // Handle notification tap
-          print('Notification tapped with payload: ${details.payload}');
+        onDidReceiveNotificationResponse:
+            (NotificationResponse response) async {
+          print('Notification tapped with payload: ${response.payload}');
         },
       );
 
@@ -98,10 +105,9 @@ class ScheduledNotificationService {
     try {
       const AndroidNotificationDetails androidDetails =
           AndroidNotificationDetails(
-        'plant_reminder_channel', // Channel ID
-        'Plant Reminders', // Channel name
-        channelDescription:
-            'Daily reminders to check your plants', // Channel description
+        'plant_reminder_channel',
+        'Plant Reminders',
+        channelDescription: 'Daily reminders to check your plants',
         importance: Importance.high,
         priority: Priority.high,
       );
@@ -143,7 +149,7 @@ class ScheduledNotificationService {
         id,
         "Reminder: ${reminder.plantName}",
         body,
-        TZDateTime.from(scheduledDate, local),
+        tz.TZDateTime.from(scheduledDate, tz.local),
         notificationDetails,
         androidAllowWhileIdle: true,
         uiLocalNotificationDateInterpretation:
